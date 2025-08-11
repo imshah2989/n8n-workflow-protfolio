@@ -1,0 +1,395 @@
+{
+  "name": "voice agent with free tools",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        160
+      ],
+      "id": "73bfa43a-3bb7-4d99-bd84-e5e16e78c56f",
+      "name": "Telegram Trigger",
+      "webhookId": "0eeb79e9-ac6d-4c21-bb6d-690248973e2d",
+      "credentials": {
+        "telegramApi": {
+          "id": "vPEaFGnJgYOMZFKy",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        592,
+        160
+      ],
+      "id": "58ad6c68-d970-4f9e-815e-14aeedb67a13",
+      "name": "Get a file",
+      "webhookId": "0f77dfc6-55fe-49e7-9a7b-f125daae26ef",
+      "credentials": {
+        "telegramApi": {
+          "id": "vPEaFGnJgYOMZFKy",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1392,
+        352
+      ],
+      "id": "6e2656e2-1a1f-4762-9abf-f22ccb70292f",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "CdJVKIgPHwq1tzN7",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.assemblyai.com/v2/upload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "e035627ffc954bf7baa9e68330ea2f1f"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        816,
+        160
+      ],
+      "id": "d1fd412d-35bd-40a1-90fc-b95e242d70f3",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.assemblyai.com/v2/transcript",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "e035627ffc954bf7baa9e68330ea2f1f"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "audio_url",
+              "value": "={{ $json.upload_url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        160
+      ],
+      "id": "d16e714a-444a-471f-9095-06d5a3f00818",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.assemblyai.com/v2/transcript/{{ $json.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "e035627ffc954bf7baa9e68330ea2f1f"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1296,
+        160
+      ],
+      "id": "1b125a87-9139-4f10-846e-259e1b88baa5",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "# Overview\nYou are an expert research agent. You will be fed information, and you need to make a concise summary. about three sentences\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1536,
+        144
+      ],
+      "id": "71cd1080-1d91-46d8-8b11-2b492aab4804",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://qwen-qwen-tts-demo.hf.space/gradio_api/call/predict",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"data\": [ $json.output, \"Dylan\" ] } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1952,
+        144
+      ],
+      "id": "1efeaf24-3939-4e81-b378-9b77245cdde6",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "url": "=https://qwen-qwen-tts-demo.hf.space/gradio_api/call/predict/{{ $json.event_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2144,
+        128
+      ],
+      "id": "0610d4d4-ffdc-4eb5-8a18-ad39fd6335eb",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputText = $input.first().json.data\n\n// Extract the JSON part after \"data: \"\nconst dataLine = inputText.split('\\n').find(line => line.startsWith('data: '));\nconst jsonString = dataLine?.replace('data: ', '');\n\nlet audioUrl = null;\n\ntry {\n  const dataArray = JSON.parse(jsonString);\n  if (Array.isArray(dataArray) && dataArray[0]?.url) {\n    audioUrl = dataArray[0].url;\n  }\n} catch (e) {\n  throw new Error(\"Failed to parse JSON from input text.\");\n}\n\nreturn [{ json: { audioUrl } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2336,
+        176
+      ],
+      "id": "2f8f514e-7b21-4716-9b10-a2474b5c2a5c",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.audioUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2336,
+        432
+      ],
+      "id": "748ed5bf-9e60-4a3c-a5b3-ec5fd2dd92f8",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2512,
+        560
+      ],
+      "id": "7800d97e-6ee2-4683-b8cc-640c67b0a309",
+      "name": "Send an audio file",
+      "webhookId": "036c1877-3ee7-4431-bcf7-e0cdf3f90088",
+      "credentials": {
+        "telegramApi": {
+          "id": "vPEaFGnJgYOMZFKy",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "Send an audio file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1b58a74f-df72-4029-b400-6541d2e3d663",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7e2678144a6e5bfa832af2b949c97c2a44e0584e8246fc8382691d9cb694cd0d"
+  },
+  "id": "EN4u0igq4aLJVokY",
+  "tags": []
+}
