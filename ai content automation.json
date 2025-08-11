@@ -1,0 +1,214 @@
+{
+  "name": "ai content automation",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "9355c8a2-7cbe-432f-ae4e-ab5276b19fc5",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        3168,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a creative social media strategist and content ideation expert. Your task is to generate unique, engaging, and trend-aware video content ideas for platforms like TikTok, Instagram Reels, and YouTube Shorts. Each idea should be concise, original, and tailored to maximize audience engagement. Consider current trends, challenges, and viral formats. Include a catchy title, a brief description, and suggest a target audience. Avoid generic or overused concepts.\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "\n\ntitle — \n\ndescription —\n\ntargetAudience\n\nplatforms — \n\nstyle —\n\ntone — \n\nduration\n\ncallToAction — \n extract these"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        3424,
+        512
+      ],
+      "id": "dce38219-252d-4e58-b712-3b5b8ad874c1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        3296,
+        720
+      ],
+      "id": "46ec916c-a1b6-4d87-bb8d-ceb150c5abcf",
+      "name": "Groq Chat Model"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"videoContentIdeas\": [\n    {\n      \"title\": \"Mood Mirror\",\n      \"description\": \"Create a series of short, stylized videos that showcase different emotions and moods through mirrored reflections. Use creative editing, music, and captions to convey the mood, and encourage viewers to share their own mood reflections.\",\n      \"targetAudience\": [\"Young adults\", \"Emotional expression enthusiasts\", \"Music lovers\"],\n      \"platforms\": [\"TikTok\", \"Instagram Reels\", \"YouTube Shorts\"],\n      \"style\": \"Cinematic, reflective, emotional\",\n      \"tone\": \"Expressive, artistic\",\n      \"duration\": \"15–60 seconds\",\n      \"callToAction\": \"Share your current mood in the comments or duet this with your reflection!\"\n    },\n    {\n      \"title\": \"Surreal Kitchen Hacks\",\n      \"description\": \"Transform everyday kitchen tasks into surreal, dreamlike scenarios. Use visual effects, odd sound design, and unexpected twists to turn basic cooking steps into magical experiences.\",\n      \"targetAudience\": [\"Home cooks\", \"Art lovers\", \"Surreal content fans\", \"Gen Z creatives\"],\n      \"platforms\": [\"TikTok\", \"Instagram Reels\", \"YouTube Shorts\"],\n      \"style\": \"Surreal, visually experimental, satisfying\",\n      \"tone\": \"Whimsical, intriguing\",\n      \"duration\": \"15–45 seconds\",\n      \"callToAction\": \"Tag a friend who needs to try this magical kitchen hack!\"\n    }\n  ]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        3600,
+        720
+      ],
+      "id": "6de5dca0-8e07-40ce-a309-1b6739cbc68f",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "instructions": "> Take the array in output.videoContentIdeas and output each idea as a separate item. For each item, include the fields: title, description, targetAudience, platforms, style, tone, duration, and callToAction.\n",
+        "codeGeneratedForPrompt": "> Take the array in output.videoContentIdeas and output each idea as a separate item. For each item, include the fields: title, description, targetAudience, platforms, style, tone, duration, and callToAction.\n",
+        "jsCode": "const items = $input.all();\nconst videoContentIdeas = items.flatMap(\n  (item) => item.json.output.videoContentIdeas,\n);\nreturn videoContentIdeas;\n"
+      },
+      "type": "n8n-nodes-base.aiTransform",
+      "typeVersion": 1,
+      "position": [
+        3840,
+        512
+      ],
+      "id": "bb4f02f4-1b71-488d-9249-34953c56de2c",
+      "name": "AI Transform"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1SR6mUtb1XAn89Z24ldUq5tyQy3PhdgCCqBClEDu7sWI",
+          "mode": "list",
+          "cachedResultName": "ai conetent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SR6mUtb1XAn89Z24ldUq5tyQy3PhdgCCqBClEDu7sWI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SR6mUtb1XAn89Z24ldUq5tyQy3PhdgCCqBClEDu7sWI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ $json.title }}",
+            "description": "={{ $json.description }}",
+            "targetAudience": "={{ $json.targetAudience }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "targetAudience",
+              "displayName": "targetAudience",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        4048,
+        512
+      ],
+      "id": "ddd17165-b568-4104-b150-736587c2ec79",
+      "name": "Append row in sheet"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "AI Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Transform": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5d772b0e-5c1b-4cfc-af29-f264d6994d5b",
+  "meta": {
+    "instanceId": "7e2678144a6e5bfa832af2b949c97c2a44e0584e8246fc8382691d9cb694cd0d"
+  },
+  "id": "CF6sy6EJhXQ3a6u2",
+  "tags": []
+}
