@@ -1,0 +1,175 @@
+{
+  "name": "My workflow 6",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "667ca354-cc10-40fe-896b-08153fad7857",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        384,
+        480
+      ],
+      "id": "a9f7beea-7c53-47bc-bd80-a13966f9f8d4",
+      "name": "Webhook",
+      "webhookId": "667ca354-cc10-40fe-896b-08153fad7857"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.content }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        480
+      ],
+      "id": "6c7fc3cd-9cf0-4c08-84ca-e913cac01ca6",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1520,
+        480
+      ],
+      "id": "fcd04d17-1e1f-4a67-ac31-6c59a11fd6ed",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "content": "# ElevenLabs Conversational Agent\n",
+        "height": 400,
+        "width": 1232,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        656,
+        432
+      ],
+      "id": "209f8634-fe1f-440d-8802-222fbb293e87",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        784,
+        736
+      ],
+      "id": "79f54424-5b17-4d95-af2c-1771e517eb8b",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "CdJVKIgPHwq1tzN7",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-nano",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-NANO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.body.searchquery }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        640,
+        480
+      ],
+      "id": "d55fff03-a16e-4ad0-877d-77aca0e6ea63",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "3uaPALkS5P6EmDwc",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c4451b15-390e-4ba9-9e3d-452e5a2f1120",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7e2678144a6e5bfa832af2b949c97c2a44e0584e8246fc8382691d9cb694cd0d"
+  },
+  "id": "6M5DgivN2Afo8ss1",
+  "tags": []
+}
